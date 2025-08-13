@@ -13,6 +13,10 @@ doc/api/
 
 # dotenv environment variables file
 .env*
+lib/src/common/constant/config.dart
+
+# Database
+database.sqlite
 
 # Avoid committing generated Javascript files:
 *.dart.js
