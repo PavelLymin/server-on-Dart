@@ -12,10 +12,10 @@ class MessageHandler {
 
   Router get router => _$MessageHandlerRouter(this);
 
-  @Route.get('/messages/')
+  @Route.get('/messages')
   Future<Response> allMessages(Request request) async {
     try {
-      final chatId = request.url.queryParameters['chatId'];
+      final chatId = request.url.queryParameters['chat_id'];
       final result = await _repository.fetchMessages(
         chatId: int.parse(chatId!),
       );

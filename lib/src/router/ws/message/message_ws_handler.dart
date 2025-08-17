@@ -31,12 +31,13 @@ class MessageWsHandler {
         });
       case MessageDeleteRequest messageDelete:
         await _messageRepository.deleteMessage(
-          chatId: messageDelete.message.chatId,
-          messageId: messageDelete.message.id,
+          messageId: messageDelete.messageId,
+          chatId: messageDelete.chatId,
         );
         ws.sink.add({
           'type': MessaheRequestType.messageDelete.value,
-          'message': messageDelete.message.toJson(),
+          'message_id': messageDelete.messageId,
+          'chat_id': messageDelete.chatId,
         });
       case MessageErrorRequest messageError:
         ws.sink.add({

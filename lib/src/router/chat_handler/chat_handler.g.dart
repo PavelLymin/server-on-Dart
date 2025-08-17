@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'message_handler.dart';
+part of 'chat_handler.dart';
 
 // **************************************************************************
 // ShelfRouterGenerator
 // **************************************************************************
 
-Router _$MessageHandlerRouter(MessageHandler service) {
+Router _$ChatHandlerRouter(ChatHandler service) {
   final router = Router();
-  router.add('GET', r'/messages', service.allMessages);
+  router.add('GET', r'/chats', service.allChats);
   return router;
 }

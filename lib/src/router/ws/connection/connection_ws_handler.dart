@@ -18,19 +18,13 @@ class ConnectionWsHandler {
 
   final ChatWsHandler _chatWsHandler;
 
-  final _connections = <String, WebSocketChannel>{};
-
-  final _chatMembers = <String, Set<String>>{};
+  final _chatMembers = <int, Set<WebSocketChannel>>{};
 
   Router get router => _$ConnectionWsHandlerRouter(this);
 
   @Route.get('/ws/connection')
   Future<Response> connect(Request request) async {
     return webSocketHandler((ws, _) {
-      final userId = request.context['user_id'] as String;
-
-      _connections.putIfAbsent(userId, () => ws);
-
       ws.stream.listen(
         (message) {
           try {
@@ -50,6 +44,9 @@ class ConnectionWsHandler {
           }
         },
         onDone: () {
+          for (var set in _chatMembers.values) {
+            set.removeWhere((client) => identical(ws, client));
+          }
           ws.sink.close();
         },
         onError: (error, stackTrace) {

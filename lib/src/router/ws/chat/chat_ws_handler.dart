@@ -11,32 +11,25 @@ class ChatWsHandler {
   Future<void> chatHandler(
     Map<String, dynamic> json,
     WebSocketChannel ws,
-    Map<String, Set<String>> chatMembers,
+    Map<int, Set<WebSocketChannel>> chatMembers,
   ) async {
     final response = ChatRequestHandler.fromJson(json);
     switch (response) {
       case CreateChatRequest newChat:
-        final chat = await _chatRepository.createChat(chat: newChat.chat);
-
-        chatMembers.putIfAbsent(
-          chat.id.toString(),
-          () => {chat.userId, chat.doctorId},
-        );
+        await _chatRepository.createChat(chat: newChat.chat);
 
         ws.sink.add({
           'type': ChatRequestType.create.value,
           'chat': newChat.chat.toJson(),
         });
-      case UpdateChatRequest chatUpdate:
-        await _chatRepository.updateChat(chat: chatUpdate.chat);
-        ws.sink.add({
-          'type': ChatRequestType.update.value,
-          'chat': chatUpdate.chat.toJson(),
-        });
+      case ConnectToChatRequest connect:
+        chatMembers[connect.chatId] == null
+            ? chatMembers[connect.chatId] = Set.from({ws})
+            : chatMembers[connect.chatId]!.add(ws);
       case DeleteChatRequest chatDelete:
         await _chatRepository.deleteChat(chatId: chatDelete.chatId);
 
-        chatMembers.remove(chatDelete.chatId.toString());
+        chatMembers.remove(chatDelete.chatId);
 
         ws.sink.add({
           'type': ChatRequestType.delete.value,

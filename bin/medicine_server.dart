@@ -13,18 +13,25 @@ void main(List<String> arguments) async {
     exit(0);
   });
 
-  final pipeline = Pipeline()
+  final handlersWithAuth = Cascade()
+      .add(container.chatHandler.router.call)
+      .add(container.connectionWsHandler.router.call)
+      .add(container.messageHandler.router.call);
+
+  // final handlersWithoutAuth = Cascade();
+
+  final pipelineaWithAuth = Pipeline()
       .addMiddleware(corsHeaders())
       .addMiddleware(logRequests())
       .addMiddleware(AuthenticationMiddleware.handle())
-      .addHandler(container.connectionWsHandler.router.call);
+      .addHandler(handlersWithAuth.handler);
 
-  final pipelineWithoutAuth = Pipeline()
-      .addMiddleware(corsHeaders())
-      .addMiddleware(logRequests())
-      .addHandler(container.messageHandler.router.call);
+  // final pipelineWithoutAuth = Pipeline()
+  //     .addMiddleware(corsHeaders())
+  //     .addMiddleware(logRequests())
+  //     .addHandler(handlersWithoutAuth.handler);
 
-  final handler = Cascade().add(pipelineWithoutAuth).add(pipeline).handler;
+  final handler = Cascade().add(pipelineaWithAuth).handler;
 
   await serve(handler, InternetAddress.anyIPv4, 8080);
 }

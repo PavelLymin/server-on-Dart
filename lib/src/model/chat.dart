@@ -1,145 +1,109 @@
 import 'package:drift/drift.dart';
 import 'package:medicine_server/src/data/database/database.dart';
+import 'package:medicine_server/src/model/message.dart';
+import 'package:medicine_server/src/model/user.dart';
 
-abstract class ChatEntity {
-  const ChatEntity({
-    required this.userId,
-    required this.doctorId,
-    this.avatarUrl,
-  });
+sealed class ChatEntity {
+  const ChatEntity();
+
+  const factory ChatEntity.created({
+    required String userId,
+    required String doctorId,
+  }) = CreatedChatEntity;
+}
+
+class CreatedChatEntity extends ChatEntity {
+  const CreatedChatEntity({required this.userId, required this.doctorId});
 
   final String userId;
   final String doctorId;
-  final String? avatarUrl;
 
-  ChatsCompanion toCompanion();
+  factory CreatedChatEntity.fromJson(Map<String, dynamic> json) =>
+      CreatedChatEntity(
+        userId: json['user_id'] as String,
+        doctorId: json['doctor_id'] as String,
+      );
 
-  Map<String, dynamic> toJson();
-}
+  Map<String, dynamic> toJson() => {'user_id': userId, 'doctor_id': doctorId};
 
-class CreatedChat extends ChatEntity {
-  const CreatedChat({
-    required super.userId,
-    required super.doctorId,
-    super.avatarUrl,
-  });
+  factory CreatedChatEntity.fromCompanion(Chat companion) =>
+      CreatedChatEntity(userId: companion.userId, doctorId: companion.doctorId);
 
-  factory CreatedChat.fromJson(Map<String, dynamic> json) {
-    return CreatedChat(
-      userId: json['user_id'] as String,
-      doctorId: json['doctor_id'] as String,
-      avatarUrl: json['avatar_url'] as String?,
-    );
-  }
-
-  @override
-  Map<String, dynamic> toJson() => {
-    'user_id': userId,
-    'doctor_id': doctorId,
-    'avatar_url': avatarUrl,
-  };
-
-  @override
-  ChatsCompanion toCompanion() {
-    return ChatsCompanion(
-      userId: Value(userId),
-      doctorId: Value(doctorId),
-      avatarUrl: Value(avatarUrl),
-    );
-  }
-
-  factory CreatedChat.fromCompanion(Chat companion) => CreatedChat(
-    userId: companion.userId,
-    doctorId: companion.doctorId,
-    avatarUrl: companion.avatarUrl,
-  );
+  ChatsCompanion toCompanion() =>
+      ChatsCompanion(userId: Value(userId), doctorId: Value(doctorId));
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is CreatedChat &&
+    return other is CreatedChatEntity &&
         other.userId == userId &&
-        other.doctorId == doctorId &&
-        other.avatarUrl == avatarUrl;
+        other.doctorId == doctorId;
   }
 
   @override
-  int get hashCode => Object.hash(userId, doctorId, avatarUrl);
+  int get hashCode => Object.hash(userId, doctorId);
 
   @override
   String toString() {
-    return 'CreatedChat(userId: $userId, doctorId: $doctorId, avatarUrl: $avatarUrl)';
+    return 'CreatedChat(userId: $userId, doctorId: $doctorId)';
   }
 }
 
-class FullChat extends ChatEntity {
-  const FullChat({
-    required super.userId,
-    required super.doctorId,
-    super.avatarUrl,
+class FullChatEnity extends ChatEntity {
+  const FullChatEnity({
     required this.id,
+    required this.interlocutor,
+    required this.lastMessage,
     required this.createdAt,
   });
 
   final int id;
+  final UserEntity interlocutor;
+  final FullMessage lastMessage;
   final DateTime createdAt;
 
-  factory FullChat.fromJson(Map<String, dynamic> json) {
-    return FullChat(
-      userId: json['user_id'] as String,
-      doctorId: json['doctor_id'] as String,
-      avatarUrl: json['avatar_url'] as String?,
-      id: json['id'] as int,
-      createdAt: DateTime.parse(json['created_at'] as String),
-    );
-  }
+  factory FullChatEnity.fromJson(Map<String, dynamic> json) => FullChatEnity(
+    id: json['id'] as int,
+    interlocutor: UserEntity.fromJson(
+      json['interlocutor'] as Map<String, dynamic>,
+    ),
+    lastMessage: FullMessage.fromJson(
+      json['last_message'] as Map<String, dynamic>,
+    ),
+    createdAt: DateTime.parse(json['created_at'] as String),
+  );
 
-  @override
   Map<String, dynamic> toJson() => {
-    'user_id': userId,
-    'doctor_id': doctorId,
-    'avatar_url': avatarUrl,
     'id': id,
+    'interlocutor': interlocutor.toJson(),
+    'last_message': lastMessage.toJson(),
     'created_at': createdAt.toIso8601String(),
   };
 
-  @override
-  ChatsCompanion toCompanion() {
-    return ChatsCompanion(
-      id: Value(id),
-      userId: Value(userId),
-      doctorId: Value(doctorId),
-      avatarUrl: Value(avatarUrl),
-      createdAt: Value(createdAt),
-    );
-  }
-
-  factory FullChat.fromCompanion(Chat companion) => FullChat(
-    userId: companion.userId,
-    doctorId: companion.doctorId,
-    avatarUrl: companion.avatarUrl,
-    id: companion.id,
-    createdAt: companion.createdAt,
+  factory FullChatEnity.fromCompanion(
+    Chat chatCompanion,
+    Message messageCompanion,
+    User interlocutor,
+  ) => FullChatEnity(
+    id: chatCompanion.id,
+    createdAt: chatCompanion.createdAt,
+    lastMessage: FullMessage.fromCompanion(messageCompanion),
+    interlocutor: UserEntity.fromCompanion(interlocutor),
   );
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is FullChat &&
-        other.id == id &&
-        other.userId == userId &&
-        other.doctorId == doctorId &&
-        other.avatarUrl == avatarUrl &&
-        other.createdAt == createdAt;
+    return other is FullChatEnity && other.id == id;
   }
 
   @override
-  int get hashCode => Object.hash(id, userId, doctorId, avatarUrl, createdAt);
+  int get hashCode => id.hashCode;
 
   @override
   String toString() {
-    return 'FullChat(id: $id, userId: $userId, doctorId: $doctorId, avatarUrl: $avatarUrl, createdAt: $createdAt)';
+    return 'FullChat(id: $id, interlocutor: $interlocutor, createdAt: $createdAt, lastMessage: $lastMessage)';
   }
 }

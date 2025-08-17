@@ -69,17 +69,23 @@ class MessageUpdateRequest extends MessageRequstHandler {
 
 class MessageDeleteRequest extends MessageRequstHandler {
   const MessageDeleteRequest({
-    required this.message,
+    required this.messageId,
+    required this.chatId,
     super.type = MessaheRequestType.messageDelete,
   });
 
-  final FullMessage message;
+  final int messageId;
+  final int chatId;
 
   factory MessageDeleteRequest.fromJson(Map<String, dynamic> json) =>
-      MessageDeleteRequest(message: FullMessage.fromJson(json['message']));
+      MessageDeleteRequest(
+        messageId: json['message_id'] as int,
+        chatId: json['chat_id'] as int,
+      );
 
   @override
-  String toString() => 'MessageDeleteResponse(message: $message)';
+  String toString() =>
+      'MessageDeleteResponse(messageId: $messageId, chatId: $chatId)';
 }
 
 class MessageErrorRequest extends MessageRequstHandler {

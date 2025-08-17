@@ -23,7 +23,14 @@ class Chats extends Table {
       dateTime().named('created_at').withDefault(currentDateAndTime)();
 }
 
-@DriftDatabase(tables: [Messages, Chats])
+class Users extends Table {
+  TextColumn get uid => text()();
+  TextColumn get displayName => text().named('display_name')();
+  TextColumn get photoURL => text().named('photo_url').nullable()();
+  TextColumn get email => text()();
+}
+
+@DriftDatabase(tables: [Messages, Chats, Users])
 class AppDatabase extends _$AppDatabase {
   AppDatabase._(super.e);
 

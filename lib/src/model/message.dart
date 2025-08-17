@@ -44,6 +44,13 @@ class CreatedMessage extends MessageEntity {
     'is_read': isRead,
   };
 
+  factory CreatedMessage.fromCompanion(Message companion) => CreatedMessage(
+    chatId: companion.chatId,
+    senderId: companion.senderId,
+    content: companion.content,
+    isRead: companion.isRead,
+  );
+
   @override
   MessagesCompanion toCompanion() {
     return MessagesCompanion(
@@ -53,13 +60,6 @@ class CreatedMessage extends MessageEntity {
       isRead: Value(isRead),
     );
   }
-
-  factory CreatedMessage.fromCompanion(Message companion) => CreatedMessage(
-    chatId: companion.chatId,
-    senderId: companion.senderId,
-    content: companion.content,
-    isRead: companion.isRead,
-  );
 
   @override
   bool operator ==(Object other) {
@@ -94,16 +94,6 @@ class FullMessage extends MessageEntity {
   final int id;
   final DateTime createdAt;
 
-  @override
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'chat_id': chatId,
-    'sender_id': senderId,
-    'content': content,
-    'created_at': createdAt.toIso8601String(),
-    'is_read': isRead,
-  };
-
   factory FullMessage.fromJson(Map<String, dynamic> json) {
     return FullMessage(
       id: json['id'] as int,
@@ -116,15 +106,14 @@ class FullMessage extends MessageEntity {
   }
 
   @override
-  MessagesCompanion toCompanion() {
-    return MessagesCompanion(
-      id: Value(id),
-      chatId: Value(chatId),
-      senderId: Value(senderId),
-      content: Value(content),
-      isRead: Value(isRead),
-    );
-  }
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'chat_id': chatId,
+    'sender_id': senderId,
+    'content': content,
+    'created_at': createdAt.toIso8601String(),
+    'is_read': isRead,
+  };
 
   factory FullMessage.fromCompanion(Message companion) => FullMessage(
     id: companion.id,
@@ -134,6 +123,17 @@ class FullMessage extends MessageEntity {
     createdAt: companion.createdAt,
     isRead: companion.isRead,
   );
+
+  @override
+  MessagesCompanion toCompanion() {
+    return MessagesCompanion(
+      id: Value(id),
+      chatId: Value(chatId),
+      senderId: Value(senderId),
+      content: Value(content),
+      isRead: Value(isRead),
+    );
+  }
 
   @override
   bool operator ==(Object other) {

@@ -2,7 +2,7 @@ import 'package:medicine_server/src/model/chat.dart';
 
 enum ChatRequestType {
   create('create'),
-  update('update'),
+  connect('connect'),
   delete('delete'),
   error('error');
 
@@ -21,16 +21,12 @@ sealed class ChatRequestHandler {
       orElse: () => throw ArgumentError('Unknown type: ${json['type']}'),
     );
 
-    switch (type) {
-      case ChatRequestType.create:
-        return CreateChatRequest.fromJson(json);
-      case ChatRequestType.update:
-        return UpdateChatRequest.fromJson(json);
-      case ChatRequestType.delete:
-        return DeleteChatRequest.fromJson(json);
-      case ChatRequestType.error:
-        return ErrorChatRequest.fromJson(json);
-    }
+    return switch (type) {
+      ChatRequestType.create => CreateChatRequest.fromJson(json),
+      ChatRequestType.connect => ConnectToChatRequest.fromJson(json),
+      ChatRequestType.delete => DeleteChatRequest.fromJson(json),
+      ChatRequestType.error => ErrorChatRequest.fromJson(json),
+    };
   }
 
   @override
@@ -43,28 +39,28 @@ class CreateChatRequest extends ChatRequestHandler {
     super.type = ChatRequestType.create,
   });
 
-  final CreatedChat chat;
+  final CreatedChatEntity chat;
 
   factory CreateChatRequest.fromJson(Map<String, dynamic> json) =>
-      CreateChatRequest(chat: CreatedChat.fromJson(json['chat']));
+      CreateChatRequest(chat: CreatedChatEntity.fromJson(json['chat']));
 
   @override
   String toString() => 'CreateChatResponse(chat: $chat)';
 }
 
-class UpdateChatRequest extends ChatRequestHandler {
-  const UpdateChatRequest({
-    required this.chat,
-    super.type = ChatRequestType.update,
+class ConnectToChatRequest extends ChatRequestHandler {
+  const ConnectToChatRequest({
+    required this.chatId,
+    super.type = ChatRequestType.connect,
   });
 
-  final CreatedChat chat;
+  final int chatId;
 
-  factory UpdateChatRequest.fromJson(Map<String, dynamic> json) =>
-      UpdateChatRequest(chat: CreatedChat.fromJson(json['chat']));
+  factory ConnectToChatRequest.fromJson(Map<String, dynamic> json) =>
+      ConnectToChatRequest(chatId: json['chat_id'] as int);
 
   @override
-  String toString() => 'UpdateChatResponse(chat: $chat)';
+  String toString() => 'ConnectChatResponse(chatId: $chatId)';
 }
 
 class DeleteChatRequest extends ChatRequestHandler {
