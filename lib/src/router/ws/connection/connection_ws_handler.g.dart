@@ -8,6 +8,6 @@ part of 'connection_ws_handler.dart';
 
 Router _$ConnectionWsHandlerRouter(ConnectionWsHandler service) {
   final router = Router();
-  router.add('GET', r'/ws/connection', service.connect);
+  router.add('GET', r'/connection', service.connect);
   return router;
 }

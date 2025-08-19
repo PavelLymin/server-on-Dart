@@ -7,6 +7,14 @@ import 'package:shelf_web_socket/shelf_web_socket.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 part 'connection_ws_handler.g.dart';
 
+enum RequestType {
+  message('message'),
+  chat('chat');
+
+  const RequestType(this.value);
+  final String value;
+}
+
 class ConnectionWsHandler {
   ConnectionWsHandler({
     required MessageWsHandler messageWsHandler,
@@ -22,7 +30,7 @@ class ConnectionWsHandler {
 
   Router get router => _$ConnectionWsHandlerRouter(this);
 
-  @Route.get('/ws/connection')
+  @Route.get('/connection')
   Future<Response> connect(Request request) async {
     return webSocketHandler((ws, _) {
       ws.stream.listen(
@@ -30,13 +38,15 @@ class ConnectionWsHandler {
           try {
             final json = jsonDecode(message) as Map<String, dynamic>;
 
-            _messageWsHandler.messageHandler(json, ws);
-
-            _chatWsHandler.chatHandler(json, ws, _chatMembers);
+            if (json['request_type'] == RequestType.message.value) {
+              _messageWsHandler.messageHandler(json, ws);
+            } else if (json['request_type'] == RequestType.chat.value) {
+              _chatWsHandler.chatHandler(json, ws, _chatMembers);
+            }
           } catch (error, stackTrace) {
             ws.sink.add(
               jsonEncode({
-                'message': 'Invalid message format ',
+                'message': 'Invalid message format',
                 'error': error.toString(),
                 'stackTrace': stackTrace.toString(),
               }),

@@ -41,10 +41,11 @@ class ChatRepository implements IChatRepository {
           )
           ..orderBy([
             OrderingTerm(
-              expression: _database.chats.createdAt,
+              expression: _database.messages.createdAt,
               mode: OrderingMode.desc,
             ),
-          ]);
+          ])
+          ..limit(1);
 
     final result = await query.get();
 

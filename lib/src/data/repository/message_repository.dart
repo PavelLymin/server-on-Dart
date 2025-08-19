@@ -5,14 +5,14 @@ import 'package:medicine_server/src/model/message.dart';
 abstract interface class IMessageRepository {
   Future<FullMessage> saveMessage({required CreatedMessage message});
 
-  Future<List<MessageEntity>> fetchMessages({required int chatId});
+  Future<List<FullMessage>> fetchMessages({required int chatId});
 
-  Future<MessageEntity> deleteMessage({
+  Future<FullMessage> deleteMessage({
     required int chatId,
     required int messageId,
   });
 
-  Future<MessageEntity> updateMessage({required CreatedMessage message});
+  Future<FullMessage> updateMessage({required CreatedMessage message});
 }
 
 class MessageRepositoryImpl implements IMessageRepository {
@@ -33,14 +33,14 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<List<MessageEntity>> fetchMessages({required int chatId}) async {
+  Future<List<FullMessage>> fetchMessages({required int chatId}) async {
     final result =
         await (_database.select(_database.messages)
               ..where((message) => message.chatId.equals(chatId))
               ..orderBy([
                 (message) => OrderingTerm(
                   expression: message.createdAt,
-                  mode: OrderingMode.desc,
+                  mode: OrderingMode.asc,
                 ),
               ]))
             .get();
@@ -53,7 +53,7 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<MessageEntity> deleteMessage({
+  Future<FullMessage> deleteMessage({
     required int chatId,
     required int messageId,
   }) async {
@@ -73,7 +73,7 @@ class MessageRepositoryImpl implements IMessageRepository {
   }
 
   @override
-  Future<MessageEntity> updateMessage({required CreatedMessage message}) async {
+  Future<FullMessage> updateMessage({required CreatedMessage message}) async {
     final result =
         await (_database.update(_database.messages)..where(
               (message) =>

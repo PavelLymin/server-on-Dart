@@ -6,12 +6,14 @@ abstract class MessageEntity {
     required this.chatId,
     required this.senderId,
     required this.content,
+    required this.createdAt,
     required this.isRead,
   });
 
   final int chatId;
   final String senderId;
   final String content;
+  final DateTime createdAt;
   final bool isRead;
 
   MessagesCompanion toCompanion();
@@ -24,6 +26,7 @@ class CreatedMessage extends MessageEntity {
     required super.chatId,
     required super.senderId,
     required super.content,
+    required super.createdAt,
     super.isRead = false,
   });
 
@@ -32,6 +35,7 @@ class CreatedMessage extends MessageEntity {
       chatId: json['chat_id'] as int,
       senderId: json['sender_id'] as String,
       content: json['content'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
       isRead: json['is_read'] as bool,
     );
   }
@@ -41,6 +45,7 @@ class CreatedMessage extends MessageEntity {
     'chat_id': chatId,
     'sender_id': senderId,
     'content': content,
+    'created_at': createdAt.toIso8601String(),
     'is_read': isRead,
   };
 
@@ -48,6 +53,7 @@ class CreatedMessage extends MessageEntity {
     chatId: companion.chatId,
     senderId: companion.senderId,
     content: companion.content,
+    createdAt: companion.createdAt,
     isRead: companion.isRead,
   );
 
@@ -57,6 +63,7 @@ class CreatedMessage extends MessageEntity {
       chatId: Value(chatId),
       senderId: Value(senderId),
       content: Value(content),
+      createdAt: Value(createdAt),
       isRead: Value(isRead),
     );
   }
@@ -69,30 +76,30 @@ class CreatedMessage extends MessageEntity {
         other.chatId == chatId &&
         other.senderId == senderId &&
         other.content == content &&
+        other.createdAt == createdAt &&
         other.isRead == isRead;
   }
 
   @override
-  int get hashCode => Object.hash(chatId, senderId, content, isRead);
+  int get hashCode => Object.hash(chatId, senderId, content, createdAt, isRead);
 
   @override
   String toString() {
-    return 'CreatedMessage(chatId: $chatId, senderId: $senderId, content: $content, isRead: $isRead)';
+    return 'CreatedMessage(chatId: $chatId, senderId: $senderId, content: $content, createdAt: $createdAt, isRead: $isRead)';
   }
 }
 
 class FullMessage extends MessageEntity {
   const FullMessage({
     required this.id,
-    required this.createdAt,
     required super.chatId,
     required super.senderId,
     required super.content,
+    required super.createdAt,
     super.isRead = false,
   });
 
   final int id;
-  final DateTime createdAt;
 
   factory FullMessage.fromJson(Map<String, dynamic> json) {
     return FullMessage(
@@ -131,6 +138,7 @@ class FullMessage extends MessageEntity {
       chatId: Value(chatId),
       senderId: Value(senderId),
       content: Value(content),
+      createdAt: Value(createdAt),
       isRead: Value(isRead),
     );
   }

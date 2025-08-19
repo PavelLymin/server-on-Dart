@@ -1,34 +1,38 @@
 import 'package:medicine_server/src/model/message.dart';
 
-enum MessaheRequestType {
-  newMessage('new_message'),
+enum MessageRequestType {
+  newMessage('message_send'),
   messageUpdate('message_update'),
   messageDelete('message_delete'),
   messageError('message_error');
 
-  const MessaheRequestType(this.value);
+  const MessageRequestType(this.value);
   final String value;
+
+  factory MessageRequestType.fromString(String value) =>
+      MessageRequestType.values.firstWhere(
+        (type) => type.value == value.trim().toLowerCase(),
+        orElse: () =>
+            throw ArgumentError('Unknown message request type: $value'),
+      );
 }
 
 sealed class MessageRequstHandler {
   const MessageRequstHandler({required this.type});
 
-  final MessaheRequestType type;
+  final MessageRequestType type;
 
   factory MessageRequstHandler.fromJson(Map<String, dynamic> json) {
-    final type = MessaheRequestType.values.firstWhere(
-      (e) => e.value == json['type'] as String,
-      orElse: () => throw ArgumentError('Unknown type: ${json['type']}'),
-    );
+    final type = MessageRequestType.fromString(json['type']);
 
     switch (type) {
-      case MessaheRequestType.newMessage:
+      case MessageRequestType.newMessage:
         return NewMessageRequest.fromJson(json);
-      case MessaheRequestType.messageUpdate:
+      case MessageRequestType.messageUpdate:
         return MessageUpdateRequest.fromJson(json);
-      case MessaheRequestType.messageDelete:
+      case MessageRequestType.messageDelete:
         return MessageDeleteRequest.fromJson(json);
-      case MessaheRequestType.messageError:
+      case MessageRequestType.messageError:
         return MessageErrorRequest.fromJson(json);
     }
   }
@@ -40,13 +44,17 @@ sealed class MessageRequstHandler {
 class NewMessageRequest extends MessageRequstHandler {
   const NewMessageRequest({
     required this.message,
-    super.type = MessaheRequestType.newMessage,
+    super.type = MessageRequestType.newMessage,
   });
 
   final CreatedMessage message;
 
   factory NewMessageRequest.fromJson(Map<String, dynamic> json) =>
-      NewMessageRequest(message: CreatedMessage.fromJson(json['message']));
+      NewMessageRequest(
+        message: CreatedMessage.fromJson(
+          json['message'] as Map<String, dynamic>,
+        ),
+      );
 
   @override
   String toString() => 'NewMessageResponse(message: $message)';
@@ -55,7 +63,7 @@ class NewMessageRequest extends MessageRequstHandler {
 class MessageUpdateRequest extends MessageRequstHandler {
   const MessageUpdateRequest({
     required this.message,
-    super.type = MessaheRequestType.messageUpdate,
+    super.type = MessageRequestType.messageUpdate,
   });
 
   final CreatedMessage message;
@@ -71,7 +79,7 @@ class MessageDeleteRequest extends MessageRequstHandler {
   const MessageDeleteRequest({
     required this.messageId,
     required this.chatId,
-    super.type = MessaheRequestType.messageDelete,
+    super.type = MessageRequestType.messageDelete,
   });
 
   final int messageId;
@@ -91,7 +99,7 @@ class MessageDeleteRequest extends MessageRequstHandler {
 class MessageErrorRequest extends MessageRequstHandler {
   const MessageErrorRequest({
     required this.error,
-    super.type = MessaheRequestType.messageError,
+    super.type = MessageRequestType.messageError,
   });
 
   final String error;

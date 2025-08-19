@@ -8,6 +8,14 @@ enum ChatRequestType {
 
   const ChatRequestType(this.value);
   final String value;
+
+  factory ChatRequestType.fromString(String? value) {
+    return ChatRequestType.values.firstWhere(
+      (type) => type.value == value?.trim().toLowerCase(),
+      orElse: () =>
+          throw ArgumentError('Unknown message response type: $value'),
+    );
+  }
 }
 
 sealed class ChatRequestHandler {
@@ -16,10 +24,7 @@ sealed class ChatRequestHandler {
   final ChatRequestType type;
 
   factory ChatRequestHandler.fromJson(Map<String, dynamic> json) {
-    final type = ChatRequestType.values.firstWhere(
-      (e) => e.value == json['type'] as String,
-      orElse: () => throw ArgumentError('Unknown type: ${json['type']}'),
-    );
+    final type = ChatRequestType.fromString(json['type']);
 
     return switch (type) {
       ChatRequestType.create => CreateChatRequest.fromJson(json),

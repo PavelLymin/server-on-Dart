@@ -18,18 +18,11 @@ void main(List<String> arguments) async {
       .add(container.connectionWsHandler.router.call)
       .add(container.messageHandler.router.call);
 
-  // final handlersWithoutAuth = Cascade();
-
   final pipelineaWithAuth = Pipeline()
       .addMiddleware(corsHeaders())
       .addMiddleware(logRequests())
       .addMiddleware(AuthenticationMiddleware.handle())
       .addHandler(handlersWithAuth.handler);
-
-  // final pipelineWithoutAuth = Pipeline()
-  //     .addMiddleware(corsHeaders())
-  //     .addMiddleware(logRequests())
-  //     .addHandler(handlersWithoutAuth.handler);
 
   final handler = Cascade().add(pipelineaWithAuth).handler;
 

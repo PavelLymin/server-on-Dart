@@ -9,8 +9,7 @@ class Messages extends Table {
   IntColumn get chatId => integer().named('chat_id').references(Chats, #id)();
   TextColumn get senderId => text().named('sender_id')();
   TextColumn get content => text()();
-  DateTimeColumn get createdAt =>
-      dateTime().named('created_at').withDefault(currentDate)();
+  DateTimeColumn get createdAt => dateTime().named('created_at')();
   BoolColumn get isRead => boolean()();
 }
 
@@ -18,7 +17,6 @@ class Chats extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get userId => text().named('user_id')();
   TextColumn get doctorId => text().named('doctor_id')();
-  TextColumn get avatarUrl => text().named('avatar_url').nullable()();
   DateTimeColumn get createdAt =>
       dateTime().named('created_at').withDefault(currentDateAndTime)();
 }
