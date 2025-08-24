@@ -3,8 +3,7 @@ import 'package:medicine_server/src/model/message.dart';
 enum MessageRequestType {
   newMessage('message_send'),
   messageUpdate('message_update'),
-  messageDelete('message_delete'),
-  messageError('message_error');
+  messageDelete('message_delete');
 
   const MessageRequestType(this.value);
   final String value;
@@ -32,8 +31,6 @@ sealed class MessageRequstHandler {
         return MessageUpdateRequest.fromJson(json);
       case MessageRequestType.messageDelete:
         return MessageDeleteRequest.fromJson(json);
-      case MessageRequestType.messageError:
-        return MessageErrorRequest.fromJson(json);
     }
   }
 
@@ -94,19 +91,4 @@ class MessageDeleteRequest extends MessageRequstHandler {
   @override
   String toString() =>
       'MessageDeleteResponse(messageId: $messageId, chatId: $chatId)';
-}
-
-class MessageErrorRequest extends MessageRequstHandler {
-  const MessageErrorRequest({
-    required this.error,
-    super.type = MessageRequestType.messageError,
-  });
-
-  final String error;
-
-  factory MessageErrorRequest.fromJson(Map<String, dynamic> json) =>
-      MessageErrorRequest(error: json['error'] as String);
-
-  @override
-  String toString() => 'MessageErrorResponse(error: $error)';
 }

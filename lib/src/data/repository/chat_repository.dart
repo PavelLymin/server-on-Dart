@@ -8,6 +8,8 @@ abstract interface class IChatRepository {
   Future<void> createChat({required CreatedChatEntity chat});
 
   Future<int> deleteChat({required int chatId});
+
+  Future<List<String>> fetchChatMembers({required int chatId});
 }
 
 class ChatRepository implements IChatRepository {
@@ -77,5 +79,20 @@ class ChatRepository implements IChatRepository {
 
     final deletedChat = result[0].id;
     return deletedChat;
+  }
+
+  @override
+  Future<List<String>> fetchChatMembers({required int chatId}) async {
+    final result = await (_database.select(
+      _database.chats,
+    )..where((chat) => chat.id.equals(chatId))).get();
+
+    if (result.isEmpty) {
+      throw Exception('Chat not found');
+    }
+
+    final chat = result[0];
+    final members = [chat.userId, chat.doctorId];
+    return members;
   }
 }

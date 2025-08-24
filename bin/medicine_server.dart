@@ -16,7 +16,8 @@ void main(List<String> arguments) async {
   final handlersWithAuth = Cascade()
       .add(container.chatHandler.router.call)
       .add(container.connectionWsHandler.router.call)
-      .add(container.messageHandler.router.call);
+      .add(container.messageHandler.router.call)
+      .add(container.connectionWsHandler.connect);
 
   final pipelineaWithAuth = Pipeline()
       .addMiddleware(corsHeaders())
@@ -24,7 +25,5 @@ void main(List<String> arguments) async {
       .addMiddleware(AuthenticationMiddleware.handle())
       .addHandler(handlersWithAuth.handler);
 
-  final handler = Cascade().add(pipelineaWithAuth).handler;
-
-  await serve(handler, InternetAddress.anyIPv4, 8080);
+  await serve(pipelineaWithAuth, InternetAddress.anyIPv4, 8080);
 }

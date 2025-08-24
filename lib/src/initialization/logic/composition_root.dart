@@ -6,6 +6,7 @@ import '../../data/repository/chat_repository.dart';
 import '../../data/repository/message_repository.dart';
 import '../../router/chat_handler/chat_handler.dart';
 import '../../router/ws/chat/chat_ws_handler.dart';
+import '../../router/ws/precent/precent_ws_handler.dart';
 import '../dependency/depencies_container.dart';
 
 class CompositionRoot {
@@ -21,10 +22,12 @@ class CompositionRoot {
     final chatHandler = ChatHandler(repository: chatRepository);
 
     final connectionWsHandler = ConnectionWsHandler(
-      messageWsHandler: MessageWsHandler(messageRepository: messageRepository),
-      chatWsHandler: ChatWsHandler(
-        chatRepository: ChatRepository(database: database),
+      messageWsHandler: MessageWsHandler(
+        messageRepository: messageRepository,
+        chatRepository: chatRepository,
       ),
+      chatWsHandler: ChatWsHandler(chatRepository: chatRepository),
+      precentWsHandler: PrecentWsHandler(chatRepository: chatRepository),
     );
 
     final dependencies = _DependencyFactory(
